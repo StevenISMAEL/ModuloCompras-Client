@@ -27,18 +27,48 @@ const ProvidersPage = () => {
     fetchProviders();
   }, []); // El array vacío asegura que se ejecute solo una vez
 
-  return (
-    <div className="providers-page">
-      <h1>Gestión de Proveedores</h1>
-      <div className="toolbar">
-        <button className="btn-new">+ Nuevo Proveedor</button>
-        {/* Aquí irán los filtros más adelante */}
-      </div>
+ return (
+    <div className="container">
+      <h1>Módulo de Compras</h1>
+      <h2>Lista de Proveedores desde la API</h2>
 
       {loading && <p>Cargando proveedores...</p>}
-      {error && <p className="error-message">{error}</p>}
-      {!loading && !error && <ProviderList providers={providers} />}
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+
+      {!loading && !error && (
+        <table className="providers-table">
+          <thead>
+            <tr>
+              <th>Cédula/RUC</th>
+              <th>Nombre</th>
+              <th>Ciudad</th>
+              <th>Tipo</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {providers.map(provider => (
+              <tr key={provider.cedula_ruc}>
+                <td>{provider.cedula_ruc}</td>
+                <td>{provider.nombre}</td>
+                <td>{provider.ciudad}</td>
+                <td>{provider.tipo}</td>
+                <td>{provider.direccion}</td>
+                <td>{provider.telefono}</td>
+                <td>{provider.email}</td>
+                <td className={provider.estado === 'activo' ? 'activo' : 'inactivo'}>
+                  {provider.estado}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
+
   );
 };
 
