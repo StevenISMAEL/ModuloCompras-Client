@@ -1,7 +1,7 @@
 // client/src/pages/ProductsPage.jsx
 import React, { useState, useEffect } from 'react';
-import { getAllProducts } from '../services/productService';
-import ProductList from '../components/ProductList';
+import { getAllProducts } from './productService';
+import ProductList from './components/ProductList';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -25,7 +25,7 @@ const ProductsPage = () => {
 
   return (
     <div className="products-page"> {/* Puedes usar estilos similares a los de proveedores */}
-      <h1>Seleccionar Producto del Inventario</h1>
+      <h1>Lista de Productos del módulo Inventario</h1>
 
       {loading && <p>Cargando productos...</p>}
       {error && <p className="error-message">{error}</p>}

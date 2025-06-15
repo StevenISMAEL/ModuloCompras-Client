@@ -1,7 +1,6 @@
 import './App.css';
-import ProvidersPage from '../pages/ProvidersPage';
-import ProductsPage from '../pages/ProductsPage';
-
+import ProvidersPage from './features/providers'; 
+import ProductsPage from './features/products'; 
 function App() {
   return (
     <div className="container">
