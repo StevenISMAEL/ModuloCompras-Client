@@ -1,10 +1,8 @@
-// client/src/components/ProviderList.jsx
 import React from 'react';
 
 const ProviderList = ({ providers }) => {
-  // Si no hay proveedores, muestra un mensaje.
   if (providers.length === 0) {
-    return <p>No se encontraron proveedores.</p>;
+    return <div>No se encontraron proveedores.</div>;
   }
 
   return (
@@ -28,10 +26,12 @@ const ProviderList = ({ providers }) => {
             <td>{provider.ciudad}</td>
             <td>{provider.tipo_proveedor}</td>
             <td>{provider.email}</td>
-            <td>{provider.estado ? 'Activo' : 'Inactivo'}</td>
+            <td className={provider.estado ? 'activo' : 'inactivo'}>
+              {provider.estado ? 'Activo' : 'Inactivo'}
+            </td>
             <td>
-              <button className="btn-edit">✏️ Editar</button>
-              <button className="btn-delete">🗑️ Eliminar</button>
+              <button>✏️ Editar</button>
+              <button>🗑️ Eliminar</button>
             </td>
           </tr>
         ))}

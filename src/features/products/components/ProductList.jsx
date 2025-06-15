@@ -1,13 +1,12 @@
-// client/src/components/ProductList.jsx
 import React from 'react';
 
 const ProductList = ({ products }) => {
   if (!products || products.length === 0) {
-    return <p>No se encontraron productos en el inventario.</p>;
+    return <div>No se encontraron productos en el inventario.</div>;
   }
 
   return (
-    <table className="products-table"> {/* Puedes reusar los estilos de la tabla de proveedores */}
+    <table className="products-table">
       <thead>
         <tr>
           <th>ID Producto</th>
@@ -25,7 +24,7 @@ const ProductList = ({ products }) => {
             <td>${parseFloat(product.precio_unitario).toFixed(2)}</td>
             <td>{product.descripcion}</td>
             <td>
-              <button className="btn-new">Seleccionar</button>
+              <button>Seleccionar</button>
             </td>
           </tr>
         ))}

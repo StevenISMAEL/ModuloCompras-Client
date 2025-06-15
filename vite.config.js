@@ -1,18 +1,25 @@
-// client/vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/postcss'
+import autoprefixer from 'autoprefixer'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173, // Puedes usar el puerto que desees para el frontend
+    port: 5173,
     proxy: {
-      // Redirige las peticiones que empiezan con /api a tu servidor de Node.js
       '/api': {
-        target: 'http://localhost:3000', // La URL de tu API
+        target: process.env.VITE_API_URL || 'http://localhost:3000',
         changeOrigin: true,
-      }
-    }
-  }
+      },
+    },
+  },
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss,
+        autoprefixer,
+      ],
+    },
+  },
 })

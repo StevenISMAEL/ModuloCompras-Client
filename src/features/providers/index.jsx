@@ -1,41 +1,35 @@
-// client/src/pages/ProvidersPage.jsx
-import React, { useState, useEffect } from 'react';
-import { getAllProviders } from './providerService';
-import ProviderList from './components/ProviderList';
+import { useEffect, useState } from 'react'
+   import { getAllProviders } from './providerService'
+   import ProviderList from './components/ProviderList'
 
-const ProvidersPage = () => {
-  // Estado para almacenar la lista de proveedores
-  const [providers, setProviders] = useState([]);
-  // Estado para manejar el estado de carga
-  const [loading, setLoading] = useState(true);
-  // Estado para manejar cualquier error
-  const [error, setError] = useState(null);
+   function Proveedores() {
+     const [providers, setProviders] = useState([])
+     const [loading, setLoading] = useState(true)
+     const [error, setError] = useState(null)
 
-  // useEffect para cargar los datos cuando el componente se monta
-  useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const data = await getAllProviders();
-        setProviders(data);
-      } catch (err) {
-        setError('No se pudieron cargar los proveedores. Inténtalo de nuevo más tarde.');
-      } finally {
-        setLoading(false);
-      }
-    };
+     useEffect(() => {
+       const fetchData = async () => {
+         try {
+           const data = await getAllProviders()
+           setProviders(data)
+         } catch (err) {
+           setError(err.message)
+         } finally {
+           setLoading(false)
+         }
+       }
+       fetchData()
+     }, [])
 
-    fetchProviders();
-  }, []); // El array vacío asegura que se ejecute solo una vez
+     if (loading) return <p className="text-blue-dark">Cargando...</p>
+     if (error) return <p className="text-red-600">Error: {error}</p>
 
-  return (
-    <div className="providers-page">
-      <h1>Lista de Proveedores</h1>
+     return (
+       <div className="bg-white p-6 rounded-lg shadow">
+         <h2 className="text-2xl font-bold text-blue-dark mb-4">Lista de Proveedores</h2>
+         <ProviderList providers={providers} />
+       </div>
+     )
+   }
 
-      {loading && <p>Cargando proveedores...</p>}
-      {error && <p className="error-message">{error}</p>}
-      {!loading && !error && <ProviderList providers={providers} />}
-    </div>
-  );
-};
-
-export default ProvidersPage;
+   export default Proveedores
