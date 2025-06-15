@@ -1,13 +1,155 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #F3F4F6;
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6fa;
+  color: #222;
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: #23272f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-header {
+  padding: 24px 16px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: #1e2127;
+  letter-spacing: 1px;
+  color: #4f8cff;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
 
-.Toastify__toast {
-  border-radius: 0.5rem;
+.sidebar-nav li {
+  margin-bottom: 8px;
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 10px 24px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-nav a.active,
+.sidebar-nav a:hover {
+  background: #4f8cff;
+  color: #fff;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  color: #aaa;
+  border-top: 1px solid #333;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px 32px;
+}
+
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 32px;
+  color: #23272f;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+  padding: 28px 20px;
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(44, 62, 80, 0.13);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #4f8cff;
+}
+
+.card-desc {
+  font-size: 0.98rem;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.card-link {
+  color: #4f8cff;
+  text-decoration: none;
+  font-size: 0.97rem;
+  font-weight: 500;
+  transition: text-decoration 0.2s;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+.btn-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin: 0 4px;
+  transition: color 0.2s;
+}
+.btn-action:hover {
+  color: #2563eb;
 }
