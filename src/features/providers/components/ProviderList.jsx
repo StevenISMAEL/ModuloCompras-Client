@@ -1,48 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getAllProviders, deleteProvider } from "../providerService";
 import { useNavigate } from "react-router-dom";
-
-// Modal flotante reutilizable
-function ModalConfirm({ open, message, onConfirm, onCancel }) {
-  if (!open) return null;
-  return (
-    <div style={backdropStyle}>
-      <div style={modalStyle}>
-        <p style={{ fontSize: 18, marginBottom: 24 }}>{message}</p>
-        <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
-          <button className="btn-primary" onClick={onConfirm}>
-            Sí
-          </button>
-          <button className="btn-action" onClick={onCancel}>
-            No
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const backdropStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: "linear-gradient(120deg, rgba(0,0,0,0.4), rgba(37,99,235,0.2))",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const modalStyle = {
-  background: "#fff",
-  borderRadius: 12,
-  padding: "32px 28px",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
-  minWidth: 320,
-  textAlign: "center",
-};
+import ModalConfirm from "./ModalConfirm";
+import ModalDetails from "./ModalDetails";
 
 export default function ProviderList() {
   const [providers, setProviders] = useState([]);
@@ -51,6 +11,11 @@ export default function ProviderList() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [toDelete, setToDelete] = useState(null);
+
+  // Estado para detalles
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsProvider, setDetailsProvider] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -159,6 +124,14 @@ export default function ProviderList() {
           setToDelete(null);
         }}
       />
+      <ModalDetails
+        open={detailsOpen}
+        provider={detailsProvider}
+        onClose={() => {
+          setDetailsOpen(false);
+          setDetailsProvider(null);
+        }}
+      />
       {loading ? (
         <div>Cargando...</div>
       ) : (
@@ -216,7 +189,10 @@ export default function ProviderList() {
                       <button
                         className="btn-action"
                         title="Detalles"
-                        onClick={() => navigate(`detalles/${p.cedula_ruc}`)}
+                        onClick={() => {
+                          setDetailsProvider(p);
+                          setDetailsOpen(true);
+                        }}
                       >
                         👁️
                       </button>

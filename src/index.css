@@ -153,3 +153,18 @@ body {
 .btn-action:hover {
   color: #2563eb;
 }
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
