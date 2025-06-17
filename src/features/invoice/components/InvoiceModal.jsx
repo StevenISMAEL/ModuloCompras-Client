@@ -9,11 +9,19 @@ import {
 
 const ESTADOS_VALIDOS = ["Registrada", "Impresa", "Cancelada"];
 
+// Función para obtener la fecha de hoy en formato yyyy-mm-dd
+function getToday() {
+  const d = new Date();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
 export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
   const [cabecera, setCabecera] = useState({
     numero_factura: "",
     numero_factura_proveedor: "",
-    fecha_emision: "",
+    fecha_emision: getToday(),
     proveedor_cedula_ruc: "",
     tipo_pago: "Contado",
     subtotal: 0,
@@ -27,6 +35,11 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
   const [productos, setProductos] = useState([]);
   const [proveedores, setProveedores] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Solo se puede editar productos si la factura está en estado Registrada
+  const puedeEditarProductos = cabecera.estado === "Registrada";
+  // Solo se puede editar cabecera si la factura está en estado Registrada
+  const puedeEditarCabecera = !editInvoice || cabecera.estado === "Registrada";
 
   useEffect(() => {
     if (open) {
@@ -56,7 +69,7 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
             setCabecera({
               numero_factura: "",
               numero_factura_proveedor: "",
-              fecha_emision: "",
+              fecha_emision: getToday(),
               proveedor_cedula_ruc: "",
               tipo_pago: "Contado",
               subtotal: 0,
@@ -74,17 +87,25 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
     // eslint-disable-next-line
   }, [open, editInvoice]);
 
+  // Filtrar detalles por factura_id si editInvoice existe (parche frontend)
+  const detallesFiltrados =
+    editInvoice && detalles.length > 0
+      ? detalles.filter((d) => d.factura_id === editInvoice.id)
+      : detalles;
+
+  // Calcular totales SOLO con los detalles visibles
   useEffect(() => {
     let subtotal = 0,
       iva = 0,
       total = 0;
-    detalles.forEach((d) => {
+    detallesFiltrados.forEach((d) => {
       subtotal += Number(d.subtotal || 0);
       iva += Number(d.iva || 0);
       total += Number(d.total || 0);
     });
     setCabecera((c) => ({ ...c, subtotal, iva, total }));
-  }, [detalles]);
+    // eslint-disable-next-line
+  }, [detallesFiltrados]);
 
   const handleCabeceraChange = (e) => {
     const { name, value } = e.target;
@@ -162,7 +183,7 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
     setLoading(true);
 
     // Asegura nombre y descripción del producto en cada detalle antes de guardar
-    const detallesConNombre = detalles.map((d) => {
+    const detallesConNombre = detallesFiltrados.map((d) => {
       const prod = productos.find((p) => p.id_producto === d.producto_id);
       return {
         ...d,
@@ -193,12 +214,6 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
 
   if (!open) return null;
 
-  // Filtrar detalles por factura_id si editInvoice existe (parche frontend)
-  const detallesFiltrados =
-    editInvoice && detalles.length > 0
-      ? detalles.filter((d) => d.factura_id === editInvoice.id)
-      : detalles;
-
   return (
     <div style={backdropStyle}>
       <form
@@ -211,34 +226,41 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
           maxHeight: "90vh",
         }}
       >
-        <h2 style={{ fontWeight: 600, fontSize: 22, marginBottom: 16 }}>
+        <h2 style={{ fontWeight: 600, fontSize: 22, marginBottom: 24 }}>
           {editInvoice ? "Editar Factura" : "Nueva Factura"}
         </h2>
         <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 20,
+            marginBottom: 16,
+          }}
         >
           <div>
-            <label>Número Factura</label>
+            <label style={labelStyle}>Número Factura</label>
             <input
               name="numero_factura"
               value={cabecera.numero_factura}
               onChange={handleCabeceraChange}
               required
               style={inputStyle}
+              disabled={!!editInvoice}
             />
           </div>
           <div>
-            <label>Número Proveedor</label>
+            <label style={labelStyle}>Número Proveedor</label>
             <input
               name="numero_factura_proveedor"
               value={cabecera.numero_factura_proveedor}
               onChange={handleCabeceraChange}
               required
               style={inputStyle}
+              disabled={!!editInvoice}
             />
           </div>
           <div>
-            <label>Fecha Emisión</label>
+            <label style={labelStyle}>Fecha Emisión</label>
             <input
               name="fecha_emision"
               type="date"
@@ -246,16 +268,18 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
               onChange={handleCabeceraChange}
               required
               style={inputStyle}
+              disabled={!!editInvoice}
             />
           </div>
           <div>
-            <label>Proveedor (Cédula/RUC)</label>
+            <label style={labelStyle}>Proveedor (Cédula/RUC)</label>
             <select
               name="proveedor_cedula_ruc"
               value={cabecera.proveedor_cedula_ruc}
               onChange={handleCabeceraChange}
               required
               style={inputStyle}
+              disabled={!puedeEditarCabecera}
             >
               <option value="">Seleccione proveedor...</option>
               {proveedores.map((p) => (
@@ -266,19 +290,20 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
             </select>
           </div>
           <div>
-            <label>Tipo Pago</label>
+            <label style={labelStyle}>Tipo Pago</label>
             <select
               name="tipo_pago"
               value={cabecera.tipo_pago}
               onChange={handleCabeceraChange}
               style={inputStyle}
+              disabled={!puedeEditarCabecera}
             >
               <option value="Contado">Contado</option>
               <option value="Crédito">Crédito</option>
             </select>
           </div>
           <div>
-            <label>Estado</label>
+            <label style={labelStyle}>Estado</label>
             <select
               name="estado"
               value={cabecera.estado}
@@ -292,19 +317,24 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
             </select>
           </div>
         </div>
-        <label>Observaciones</label>
-        <textarea
-          name="observaciones"
-          value={cabecera.observaciones}
-          onChange={handleCabeceraChange}
-          style={{ ...inputStyle, minHeight: 40 }}
-        />
-        <h3 style={{ marginTop: 18 }}>Detalle de Productos</h3>
+        <div style={{ marginBottom: 20 }}>
+          <label style={labelStyle}>Observaciones</label>
+          <textarea
+            name="observaciones"
+            value={cabecera.observaciones}
+            onChange={handleCabeceraChange}
+            style={{ ...inputStyle, minHeight: 40 }}
+          />
+        </div>
+        <h3 style={{ marginTop: 18, marginBottom: 12 }}>
+          Detalle de Productos
+        </h3>
         <button
           type="button"
           className="btn-primary"
           onClick={handleAddDetalle}
-          style={{ marginBottom: 8 }}
+          style={{ marginBottom: 12 }}
+          disabled={!puedeEditarProductos}
         >
           + Agregar Producto
         </button>
@@ -314,9 +344,9 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
               key={idx}
               style={{
                 display: "flex",
-                gap: 8,
+                gap: 10,
                 alignItems: "center",
-                marginBottom: 8,
+                marginBottom: 12,
               }}
             >
               <select
@@ -325,7 +355,8 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
                   handleDetalleChange(idx, "producto_id", e.target.value)
                 }
                 required
-                style={{ ...inputStyle, width: 160 }}
+                style={{ ...inputStyle, width: 140 }}
+                disabled={!puedeEditarProductos}
               >
                 <option value="">Producto...</option>
                 {productos.map((p) => (
@@ -335,7 +366,7 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
                 ))}
               </select>
               {d.descripcion_producto && (
-                <span style={{ fontSize: 13, color: "#888" }}>
+                <span style={{ fontSize: 13, color: "#888", minWidth: 70 }}>
                   {d.descripcion_producto}
                 </span>
               )}
@@ -348,6 +379,7 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
                 }
                 style={{ ...inputStyle, width: 60 }}
                 placeholder="Cantidad"
+                disabled={!puedeEditarProductos}
               />
               <input
                 type="number"
@@ -359,33 +391,45 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
                     Number(e.target.value)
                   )
                 }
-                style={{ ...inputStyle, width: 90 }}
+                style={{ ...inputStyle, width: 80 }}
                 placeholder="Precio"
+                disabled={!puedeEditarProductos}
               />
-              <label>
+              <label style={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="checkbox"
                   checked={d.aplica_iva}
                   onChange={(e) =>
                     handleDetalleChange(idx, "aplica_iva", e.target.checked)
                   }
+                  disabled={!puedeEditarProductos}
+                  style={{ marginRight: 4 }}
                 />
                 IVA
               </label>
-              <span>Subtotal: {d.subtotal}</span>
-              <span>IVA: {d.iva}</span>
-              <span>Total: {d.total}</span>
+              <span style={{ minWidth: 80 }}>Subtotal: {d.subtotal}</span>
+              <span style={{ minWidth: 60 }}>IVA: {d.iva}</span>
+              <span style={{ minWidth: 80 }}>Total: {d.total}</span>
               <button
                 type="button"
                 className="btn-action"
                 onClick={() => handleRemoveDetalle(idx)}
+                disabled={!puedeEditarProductos}
+                style={{
+                  fontSize: 22,
+                  color: "#e74c3c",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                title="Eliminar producto"
               >
                 ❌
               </button>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 18, fontWeight: 600 }}>
+        <div style={{ marginTop: 18, fontWeight: 600, marginBottom: 16 }}>
           Subtotal: {cabecera.subtotal} | IVA: {cabecera.iva} | Total:{" "}
           {cabecera.total}
         </div>
@@ -394,7 +438,7 @@ export default function InvoiceModal({ open, onClose, onSaved, editInvoice }) {
             marginTop: 18,
             display: "flex",
             justifyContent: "flex-end",
-            gap: 12,
+            gap: 16,
           }}
         >
           <button className="btn-primary" type="submit" disabled={loading}>
@@ -439,4 +483,10 @@ const inputStyle = {
   borderRadius: 6,
   border: "1px solid #ccc",
   fontSize: 15,
+};
+
+const labelStyle = {
+  fontWeight: 500,
+  marginBottom: 6,
+  display: "block",
 };
